@@ -1,0 +1,22 @@
+{
+  "name": "album-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "TZ=UTC AWS_REGION=eu-west-1 ./node_modules/.bin/mocha ./test/src --recursive",
+    "deploy": "sh zip.sh"
+  },
+  "author": "Dmitry Bukhanets",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "2.2.43",
+    "moment": "latest",
+    "neo4j-driver": "latest"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3",
+    "async": "^1.5.0"
+  }
+}
