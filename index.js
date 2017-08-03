@@ -26,6 +26,25 @@ exports.handler = (event, context, callback) => {
         console.timeEnd('query duration');
         return context.fail(error);
       });
+  } else if('GET' === event.method){
+    if('undefined' === typeof event.id){
+      return context.fail('event.id is missing');
+    }
+    console.time('query duration');
+    session
+      .run("MATCH (n) WHERE id(n)=" + event.id + " RETURN n")
+      .then(result => {
+        result.records[0]._fields[0].identity = neo4j.int(result.records[0]._fields[0].identity).toNumber();
+        session.close();
+        console.timeEnd('query duration');
+        return context.succeed(result.records[0]._fields[0]);
+      })
+      .catch(error => {
+        console.log('ERROR', error);
+        session.close();
+        console.timeEnd('query duration');
+        return context.fail(error);
+      });
   } else {
     return context.fail('incorrect method');
   }
