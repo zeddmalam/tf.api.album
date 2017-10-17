@@ -5,12 +5,16 @@ exports.handler = (event, context, callback) => {
   const ENV = context.invokedFunctionArn.split(':').slice(-1).pop();
   let driver = neo4j.driver(process.env[ENV + '_DB_BOLT'], neo4j.auth.basic(process.env[ENV + '_DB_USER'], process.env[ENV + '_DB_PASSWORD']));
   let session = driver.session();
+
+  console.log('event', event);
   
   if('LIST' === event.method){
+    console.log('exec LIST');
     console.time('query duration');
     session
       .run("MATCH (n:Album) RETURN n SKIP 0 LIMIT 10")
       .then(result => {
+        console.log('got result');
         let data = [];
         result.records.forEach(record => {
           record._fields[0].identity = neo4j.int(record._fields[0].identity).toNumber();
@@ -27,6 +31,7 @@ exports.handler = (event, context, callback) => {
         return context.fail(error);
       });
   } else if('GET' === event.method){
+    console.log('exec GET');
     if('undefined' === typeof event.id){
       return context.fail('event.id is missing');
     }
@@ -34,6 +39,7 @@ exports.handler = (event, context, callback) => {
     session
       .run("MATCH (n) WHERE id(n)=" + event.id + " RETURN n")
       .then(result => {
+        console.log('got result');
         result.records[0]._fields[0].identity = neo4j.int(result.records[0]._fields[0].identity).toNumber();
         session.close();
         console.timeEnd('query duration');
